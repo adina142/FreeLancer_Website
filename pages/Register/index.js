@@ -29,7 +29,6 @@ const Register = () => {
   setLoading(true);
   setError('');
 
-  // Client-side validation
   if (!form.username || !form.email || !form.password) {
     setError('All fields are required');
     setLoading(false);
