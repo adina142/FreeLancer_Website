@@ -7,12 +7,10 @@ const postJob = async (req, res) => {
   try {
     const { title, description, budget, deadline } = req.body;
 
-    // Validation
     if (!title || !description || !budget || !deadline) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
-    // Create new job
     const newJob = new Job({
       title,
       description,
