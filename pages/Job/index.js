@@ -1,42 +1,105 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from './job.module.css';
+import EmojiPicker from 'emoji-picker-react';
+import { FaSmile } from 'react-icons/fa'; // Optional emoji button icon
 
-const JobCard = ({ job }) => (
-  <div className={styles.jobCard}>
-    <div className={styles.jobHeader}>
-      <div className={styles.jobTitleRow}>
-        <h3>{job.title}</h3>
-        <span className={styles.budget}>${job.budget}</span>
-      </div>
-      {job.skills && job.skills.length > 0 && (
-        <div className={styles.skills}>
-          <ul className={styles.skillsList}>
-            {job.skills.map((skill, index) => (
-              <li key={index} className={styles.skillBadge}>
-                {skill}
-              </li>
-            ))}
-          </ul>
+const JobCard = ({ job, showBookmarkOption = true, onBookmarkToggle }) => {
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [bookmarkLoading, setBookmarkLoading] = useState(false);
+
+  useEffect(() => {
+    const checkBookmarkStatus = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        
+        const res = await axios.get(
+          `${process.env.REACT_APP_API_URL}/bookmarks/${job._id}/status`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setIsBookmarked(res.data.bookmarked);
+      } catch (err) {
+        console.error('Error checking bookmark status:', err);
+      }
+    };
+
+    checkBookmarkStatus();
+  }, [job._id]);
+
+  const handleBookmark = async () => {
+    if (bookmarkLoading) return;
+    setBookmarkLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        // You might want to redirect to login here
+        return;
+      }
+
+      const res = await axios.post(
+        `${process.env.REACT_APP_API_URL}/bookmarks/${job._id}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setIsBookmarked(res.data.bookmarked);
+      
+      // Call the callback function if provided
+      if (onBookmarkToggle) {
+        onBookmarkToggle(job._id, res.data.bookmarked);
+      }
+    } catch (err) {
+      console.error('Error toggling bookmark:', err);
+    } finally {
+      setBookmarkLoading(false);
+    }
+  };
+
+  return (
+    <div className={styles.jobCard}>
+      <div className={styles.jobHeader}>
+        <div className={styles.jobTitleRow}>
+          <h3>{job.title}</h3>
+          <span className={styles.budget}>${job.budget}</span>
         </div>
-      )}
-    </div>
-    <p className={styles.jobDescription}>{job.description}</p>
-    <div className={styles.jobMeta}>
-      <div>
-        <span className={styles.metaLabel}>Deadline:</span>
-        <span>{new Date(job.deadline).toLocaleDateString()}</span>
+        {job.skills && job.skills.length > 0 && (
+          <div className={styles.skills}>
+            <ul className={styles.skillsList}>
+              {job.skills.map((skill, index) => (
+                <li key={index} className={styles.skillBadge}>
+                  {skill}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
-      {job.postedBy && (
+      <p className={styles.jobDescription}>{job.description}</p>
+      <div className={styles.jobMeta}>
         <div>
-          <span className={styles.metaLabel}>Posted by:</span>
-          <span>{job.postedBy.name || job.postedBy.email}</span>
+          <span className={styles.metaLabel}>Deadline:</span>
+          <span>{new Date(job.deadline).toLocaleDateString()}</span>
         </div>
+        {job.postedBy && (
+          <div>
+            <span className={styles.metaLabel}>Posted by:</span>
+            <span>{job.postedBy.name || job.postedBy.email}</span>
+          </div>
+        )}
+      </div>
+      <button className={styles.applyButton}>Apply Now</button>
+      {showBookmarkOption && (
+        <button 
+          className={`${styles.bookmarkButton} ${isBookmarked ? styles.bookmarked : ''}`}
+          onClick={handleBookmark}
+          disabled={bookmarkLoading}
+        >
+          {isBookmarked ? '★ Bookmarked' : '☆ Bookmark'}
+        </button>
       )}
     </div>
-    <button className={styles.applyButton}>Apply Now</button>
-  </div>
-);
+  );
+};
 
 const JobPostForm = () => {
   const [formData, setFormData] = useState({
@@ -46,6 +109,7 @@ const JobPostForm = () => {
     skills: '',
     deadline: ''
   });
+
   const [message, setMessage] = useState({ text: '', type: '' });
   const [submitting, setSubmitting] = useState(false);
   const [jobs, setJobs] = useState([]);
@@ -61,7 +125,6 @@ const JobPostForm = () => {
   useEffect(() => {
     fetchJobs();
   }, []);
-
   const fetchJobs = async () => {
     try {
       const res = await axios.get(`${process.env.REACT_APP_API_URL}/jobs`);
@@ -70,12 +133,18 @@ const JobPostForm = () => {
       console.error('Error fetching jobs:', err.message);
     }
   };
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
-
+const handleEmojiClick = (emojiData) => {
+    setFormData((prev) => ({
+      ...prev,
+      description: prev.description + emojiData.emoji,
+    }));
+  };
   const handleSkillKeyDown = (e) => {
     if (['Enter', ','].includes(e.key)) {
       e.preventDefault();
@@ -228,17 +297,33 @@ const JobPostForm = () => {
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="description">Job Description</label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Describe the job details..."
-              required
-              rows={5}
-            />
-          </div>
+  <label htmlFor="description">Job Description</label>
+  <div className={styles.descriptionWithEmoji}>
+    <textarea
+      id="description"
+      name="description"
+      value={formData.description}
+      onChange={handleChange}
+      placeholder="Describe the job details..."
+      required
+      rows={5}
+    />
+    <button
+      type="button"
+      className={styles.emojiButton}
+      onClick={() => setShowEmojiPicker(prev => !prev)}
+      title="Add Emoji"
+    >
+      <FaSmile />
+    </button>
+    {showEmojiPicker && (
+      <div className={styles.emojiPickerWrapper}>
+        <EmojiPicker onEmojiClick={handleEmojiClick} />
+      </div>
+    )}
+  </div>
+</div>
+
 
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
@@ -390,10 +475,18 @@ const JobPostForm = () => {
           </div>
         ) : (
           <div className={styles.jobsGrid}>
-            {filteredJobs.map(job => (
-              <JobCard key={job._id} job={job} />
-            ))}
-          </div>
+  {filteredJobs.map(job => (
+    <JobCard 
+      key={job._id} 
+      job={job} 
+      onBookmarkToggle={(jobId, isBookmarked) => {
+        // This will be called when a bookmark is toggled
+        console.log(`Job ${jobId} bookmark status changed to: ${isBookmarked}`);
+        // You can add additional logic here if needed
+      }}
+    />
+  ))}
+</div>
         )}
       </div>
     </div>
