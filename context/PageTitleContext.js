@@ -7,8 +7,6 @@ const PageTitleContext = createContext();
 export const usePageTitle = () => {
   return useContext(PageTitleContext);
 };
-
-// Create a provider component
 export const PageTitleProvider = ({ children }) => {
   const [pageTitle, setPageTitle] = useState('Default Title'); // Default title can be changed
 
