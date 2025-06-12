@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Job = require('../models/Job'); // Mongoose model
-const authMiddleware = require('../middleware/auth'); // Optional: protect route
+const authMiddleware = require('../middleware/auth'); 
 
 // @route   POST /api/jobs
 // @desc    Post a new freelance job
@@ -19,7 +19,7 @@ router.post('/', authMiddleware, async (req, res) => {
       description,
       budget,
       deadline,
-      postedBy: req.user.id, // if using auth
+      postedBy: req.user.id, 
     });
 
     await newJob.save();
