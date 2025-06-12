@@ -1,0 +1,29 @@
+.registerContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f4f6f8;
+  padding: 20px;
+}
+
+.registerCard {
+  background-color: #fff;
+  padding: 40px 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 420px;
+}
+
+.registerTitle {
+  font-weight: 600;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.registerSubtitle {
+  color: #666;
+  text-align: center;
+  margin-bottom: 30px;
+}
