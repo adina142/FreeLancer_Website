@@ -1,11 +1,10 @@
-// src/components/Layout.js
 import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import Header from '../layouts/Header';
 import './Layout.css';
 
 const Layout = () => {
-  const isLoggedIn = false; // Replace with actual auth logic
+  const isLoggedIn = false; 
 
   return (
     <div className="layout-container">
