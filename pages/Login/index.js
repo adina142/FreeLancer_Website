@@ -43,7 +43,7 @@ const Login = () => {
     });
 
     localStorage.setItem('token', res.data.token);
-    navigate('/'); // Redirect to home screen after successful login
+    navigate('/'); 
   } catch (err) {
     setError(err?.response?.data?.message || 'Login failed. Please try again.');
   } finally {
