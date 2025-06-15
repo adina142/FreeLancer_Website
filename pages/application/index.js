@@ -100,5 +100,25 @@ const Application = () => {
             required
           ></textarea>
         </div>
+        <div className={styles.field}>
+          <label className={styles.label}>Resume (PDF, max 5MB)</label>
+          <div className={styles.fileInputContainer}>
+            <input
+              type="file"
+              name="resume"
+              accept=".pdf"
+              onChange={handleChange}
+              className={styles.fileInput}
+              required
+            />
+            <div className={styles.fileInputLabel}>
+              {form.resume ? form.resume.name : 'Choose file...'}
+            </div>
+            <button type="button" className={styles.fileInputButton}>
+              Browse
+            </button>
+          </div>
+        </div>
+
 
 
