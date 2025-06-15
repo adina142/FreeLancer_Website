@@ -54,3 +54,51 @@ const Application = () => {
     }
   };
 
+  return (
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h2 className={styles.title}>Job Application</h2>
+        <p className={styles.subtitle}>Complete the form below to apply for this position</p>
+      </div>
+      
+      <form className={styles.form} onSubmit={handleSubmit}>
+        <div className={styles.field}>
+          <label className={styles.label}>Full Name</label>
+          <input
+            type="text"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            className={styles.input}
+            placeholder="John Doe"
+            required
+          />
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label}>Email Address</label>
+          <input
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            className={styles.input}
+            placeholder="john@example.com"
+            required
+          />
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label}>Cover Letter</label>
+          <textarea
+            name="coverLetter"
+            value={form.coverLetter}
+            onChange={handleChange}
+            className={styles.textarea}
+            rows="6"
+            placeholder="Tell us why you'd be a great fit for this position..."
+            required
+          ></textarea>
+        </div>
+
+
