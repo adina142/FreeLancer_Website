@@ -2,21 +2,33 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from './job.module.css';
 import EmojiPicker from 'emoji-picker-react';
-import { FaSmile } from 'react-icons/fa'; // Optional emoji button icon
-
-const JobCard = ({ job, showBookmarkOption = true, onBookmarkToggle }) => {
+import { FaSmile, FaComment, FaPaperPlane } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+const JobCard = ({ 
+  job, 
+  showBookmarkOption = true, 
+  onBookmarkToggle,
+  showComments = false,
+  onToggleComments,
+  comments = [],
+  onCommentSubmit,
+  commentText = '',
+  onCommentInputChange
+}) => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [bookmarkLoading, setBookmarkLoading] = useState(false);
+  const [commentLoading, setCommentLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkBookmarkStatus = async () => {
       try {
         const token = localStorage.getItem('token');
         if (!token) return;
-        
+
         const res = await axios.get(
-          `${process.env.REACT_APP_API_URL}/bookmarks/${job._id}/status`,
-          { headers: { Authorization: `Bearer ${token}` } }
+          ${process.env.REACT_APP_API_URL}/bookmarks/${job._id}/status,
+          { headers: { Authorization: Bearer ${token} } }
         );
         setIsBookmarked(res.data.bookmarked);
       } catch (err) {
@@ -30,21 +42,19 @@ const JobCard = ({ job, showBookmarkOption = true, onBookmarkToggle }) => {
   const handleBookmark = async () => {
     if (bookmarkLoading) return;
     setBookmarkLoading(true);
+
     try {
       const token = localStorage.getItem('token');
-      if (!token) {
-        // You might want to redirect to login here
-        return;
-      }
+      if (!token) return;
 
       const res = await axios.post(
-        `${process.env.REACT_APP_API_URL}/bookmarks/${job._id}`,
+        ${process.env.REACT_APP_API_URL}/bookmarks/${job._id},
         {},
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: Bearer ${token} } }
       );
+
       setIsBookmarked(res.data.bookmarked);
-      
-      // Call the callback function if provided
+
       if (onBookmarkToggle) {
         onBookmarkToggle(job._id, res.data.bookmarked);
       }
@@ -55,6 +65,23 @@ const JobCard = ({ job, showBookmarkOption = true, onBookmarkToggle }) => {
     }
   };
 
+  const handleApplyClick = () => {
+    navigate(/apply/${job._id});
+  };
+
+  const handleCommentSubmitClick = async () => {
+    if (!commentText.trim() || commentLoading) return;
+    setCommentLoading(true);
+
+    try {
+      await onCommentSubmit(); // jobId can be passed from parent scope
+    } catch (err) {
+      console.error('Error submitting comment:', err);
+    } finally {
+      setCommentLoading(false);
+    }
+  };
+
   return (
     <div className={styles.jobCard}>
       <div className={styles.jobHeader}>
@@ -62,7 +89,8 @@ const JobCard = ({ job, showBookmarkOption = true, onBookmarkToggle }) => {
           <h3>{job.title}</h3>
           <span className={styles.budget}>${job.budget}</span>
         </div>
-        {job.skills && job.skills.length > 0 && (
+
+        {job.skills?.length > 0 && (
           <div className={styles.skills}>
             <ul className={styles.skillsList}>
               {job.skills.map((skill, index) => (
@@ -74,28 +102,118 @@ const JobCard = ({ job, showBookmarkOption = true, onBookmarkToggle }) => {
           </div>
         )}
       </div>
+
       <p className={styles.jobDescription}>{job.description}</p>
+
       <div className={styles.jobMeta}>
         <div>
-          <span className={styles.metaLabel}>Deadline:</span>
+          <span className={styles.metaLabel}>Deadline:</span>{' '}
           <span>{new Date(job.deadline).toLocaleDateString()}</span>
         </div>
+
         {job.postedBy && (
           <div>
-            <span className={styles.metaLabel}>Posted by:</span>
+            <span className={styles.metaLabel}>Posted by:</span>{' '}
             <span>{job.postedBy.name || job.postedBy.email}</span>
           </div>
         )}
       </div>
-      <button className={styles.applyButton}>Apply Now</button>
-      {showBookmarkOption && (
-        <button 
-          className={`${styles.bookmarkButton} ${isBookmarked ? styles.bookmarked : ''}`}
-          onClick={handleBookmark}
-          disabled={bookmarkLoading}
-        >
-          {isBookmarked ? '★ Bookmarked' : '☆ Bookmark'}
+
+            <div className={styles.jobActions}>
+        <button className={styles.applyButton} onClick={handleApplyClick}>
+          Apply Now
         </button>
+
+
+
+        <div className={styles.secondaryActions}>
+          {showBookmarkOption && (
+            <button
+              className={`${styles.bookmarkButton} ${
+                isBookmarked ? styles.bookmarked : ''
+              }`}
+              onClick={handleBookmark}
+              disabled={bookmarkLoading}
+            >
+              {isBookmarked ? '★ Bookmarked' : '☆ Bookmark'}
+            </button>
+          )}
+
+          <button
+            className={styles.commentToggle}
+            onClick={() => onToggleComments(job._id)}
+          >
+            <FaComment /> {showComments ? 'Hide Comments' : 'Show Comments'}
+          </button>
+        </div>
+      </div>
+
+      {showComments && (
+        <div className={styles.commentsSection}>
+          <div className={styles.commentsList}>
+            {comments.length > 0 ? (
+              comments.map((comment) => (
+                <div key={comment._id} className={styles.comment}>
+                  <div className={styles.commentHeader}>
+                    <div className={styles.userInfo}>
+                      {comment.author?.avatar ? (
+                        <img
+                          src={comment.author.avatar}
+                          alt={comment.author.name || comment.author.email}
+                          className={styles.userAvatar}
+                        />
+                      ) : (
+                        <div className={styles.avatarPlaceholder}>
+                          {comment.author?.name?.charAt(0) ||
+                            comment.author?.email?.charAt(0) ||
+                            'U'}
+                        </div>
+                      )}
+                      <div>
+                        {comment.author?.name ? (
+                          <strong className={styles.userName}>
+                            {comment.author.name}
+                          </strong>
+                        ) : (
+                          <>
+                            <strong className={styles.userName}>Anonymous</strong>
+                            <span className={styles.userEmail}>
+                              {comment.author?.email}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    <span className={styles.commentDate}>
+                      {new Date(comment.createdAt).toLocaleString()}
+                    </span>
+                  </div>
+                  <p className={styles.commentText}>{comment.text}</p>
+                </div>
+              ))
+            ) : (
+              <p className={styles.noComments}>
+                No comments yet. Be the first to ask a question!
+              </p>
+            )}
+          </div>
+
+          <div className={styles.commentForm}>
+            <textarea
+              value={commentText}
+              onChange={(e) => onCommentInputChange(e.target.value)}
+              placeholder="Ask a question or provide clarification..."
+              rows={2}
+            />
+            <button
+              onClick={handleCommentSubmitClick}
+              disabled={!commentText.trim() || commentLoading}
+              className={styles.commentSubmit}
+            >
+              <FaPaperPlane /> {commentLoading ? 'Posting...' : 'Post'}
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -121,30 +239,48 @@ const JobPostForm = () => {
     maxBudget: ''
   });
   const [filterInput, setFilterInput] = useState('');
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [comments, setComments] = useState({});
+  const [activeCommentsJobId, setActiveCommentsJobId] = useState(null);
+  const [commentInputs, setCommentInputs] = useState({}); // { jobId: 'text' }
 
   useEffect(() => {
     fetchJobs();
   }, []);
+
   const fetchJobs = async () => {
     try {
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/jobs`);
+      const res = await axios.get(${process.env.REACT_APP_API_URL}/jobs);
       setJobs(res.data.jobs);
     } catch (err) {
       console.error('Error fetching jobs:', err.message);
     }
   };
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
+  const fetchComments = async (jobId) => {
+    try {
+      const res = await axios.get(${process.env.REACT_APP_API_URL}/comments/${jobId});
+      setComments(prev => ({
+        ...prev,
+        [jobId]: res.data
+      }));
+    } catch (err) {
+      console.error('Error fetching comments:', err.message);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
-const handleEmojiClick = (emojiData) => {
-    setFormData((prev) => ({
+
+  const handleEmojiClick = (emojiData) => {
+    setFormData(prev => ({
       ...prev,
-      description: prev.description + emojiData.emoji,
+      description: prev.description + emojiData.emoji
     }));
   };
+
   const handleSkillKeyDown = (e) => {
     if (['Enter', ','].includes(e.key)) {
       e.preventDefault();
@@ -209,18 +345,16 @@ const handleEmojiClick = (emojiData) => {
 
   const filterJobs = (jobs) => {
     return jobs.filter(job => {
-      // Filter by skills
       if (filters.skills.length > 0) {
         const jobSkills = job.skills || [];
-        const hasMatchingSkill = filters.skills.some(filterSkill => 
-          jobSkills.some(jobSkill => 
+        const hasMatchingSkill = filters.skills.some(filterSkill =>
+          jobSkills.some(jobSkill =>
             jobSkill.toLowerCase().includes(filterSkill.toLowerCase())
           )
         );
         if (!hasMatchingSkill) return false;
       }
 
-      // Filter by budget
       const jobBudget = Number(job.budget);
       if (filters.minBudget && jobBudget < Number(filters.minBudget)) {
         return false;
@@ -233,8 +367,6 @@ const handleEmojiClick = (emojiData) => {
     });
   };
 
-  const filteredJobs = filterJobs(jobs);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
@@ -242,7 +374,6 @@ const handleEmojiClick = (emojiData) => {
 
     try {
       const token = localStorage.getItem('token');
-
       const payload = {
         ...formData,
         skills: formData.skills
@@ -252,9 +383,9 @@ const handleEmojiClick = (emojiData) => {
       };
 
       await axios.post(
-        `${process.env.REACT_APP_API_URL}/jobs`,
+        ${process.env.REACT_APP_API_URL}/jobs,
         payload,
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: Bearer ${token} } }
       );
 
       setMessage({ text: 'Job posted successfully!', type: 'success' });
@@ -277,220 +408,40 @@ const handleEmojiClick = (emojiData) => {
     }
   };
 
-  return (
-    <div className={styles.container}>
-      <div className={styles.formSection}>
-        <form className={styles.jobForm} onSubmit={handleSubmit}>
-          <h2 className={styles.formTitle}>Post a Freelance Job</h2>
+  const toggleComments = (jobId) => {
+    if (activeCommentsJobId === jobId) {
+      setActiveCommentsJobId(null);
+    } else {
+      setActiveCommentsJobId(jobId);
+      if (!comments[jobId]) {
+        fetchComments(jobId);
+      }
+    }
+  };
 
-          <div className={styles.formGroup}>
-            <label htmlFor="title">Job Title</label>
-            <input
-              id="title"
-              name="title"
-              type="text"
-              value={formData.title}
-              onChange={handleChange}
-              placeholder="e.g. Web Developer Needed"
-              required
-            />
-          </div>
+  const handleCommentSubmit = async (jobId) => {
+    const commentText = commentInputs[jobId]?.trim();
+    if (!commentText) return;
 
-          <div className={styles.formGroup}>
-  <label htmlFor="description">Job Description</label>
-  <div className={styles.descriptionWithEmoji}>
-    <textarea
-      id="description"
-      name="description"
-      value={formData.description}
-      onChange={handleChange}
-      placeholder="Describe the job details..."
-      required
-      rows={5}
-    />
-    <button
-      type="button"
-      className={styles.emojiButton}
-      onClick={() => setShowEmojiPicker(prev => !prev)}
-      title="Add Emoji"
-    >
-      <FaSmile />
-    </button>
-    {showEmojiPicker && (
-      <div className={styles.emojiPickerWrapper}>
-        <EmojiPicker onEmojiClick={handleEmojiClick} />
-      </div>
-    )}
-  </div>
-</div>
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.post(
+        ${process.env.REACT_APP_API_URL}/comments/${jobId},
+        { text: commentText },
+        { headers: { Authorization: Bearer ${token} } }
+      );
 
+      setComments(prev => ({
+        ...prev,
+        [jobId]: [...(prev[jobId] || []), res.data]
+      }));
 
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label htmlFor="budget">Budget ($)</label>
-              <input
-                id="budget"
-                name="budget"
-                type="number"
-                value={formData.budget}
-                onChange={handleChange}
-                placeholder="500"
-                required
-                min={1}
-              />
-            </div>
+      setCommentInputs(prev => ({
+        ...prev,
+        [jobId]: ''
+      }));
+    } catch (err) {
+      console.error('Error posting comment:', err);
+    }
+  };
 
-            <div className={styles.formGroup}>
-              <label htmlFor="skills">Skills</label>
-              <div className={styles.skillsInputWrapper}>
-                {skills.map((skill, index) => (
-                  <span key={index} className={styles.skillTag}>
-                    {skill}
-                    <button
-                      type="button"
-                      className={styles.removeSkill}
-                      onClick={() => removeSkill(index)}
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-                <input
-                  id="skills"
-                  type="text"
-                  value={skillInput}
-                  onChange={(e) => setSkillInput(e.target.value)}
-                  onKeyDown={handleSkillKeyDown}
-                  placeholder="Type and press Enter to add"
-                  className={styles.skillInput}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.formGroup}>
-            <label htmlFor="deadline">Deadline</label>
-            <input
-              id="deadline"
-              name="deadline"
-              type="date"
-              value={formData.deadline}
-              onChange={handleChange}
-              required
-              min={new Date().toISOString().split('T')[0]}
-            />
-          </div>
-
-          <button
-            type="submit"
-            className={styles.submitButton}
-            disabled={submitting}
-          >
-            {submitting ? (
-              <>
-                <span className={styles.spinner}></span> Posting...
-              </>
-            ) : 'Post Job'}
-          </button>
-
-          {message.text && (
-            <p className={`${styles.message} ${styles[message.type]}`}>
-              {message.text}
-            </p>
-          )}
-        </form>
-      </div>
-
-      <div className={styles.jobsSection}>
-        <div className={styles.filterSection}>
-          <h2 className={styles.sectionTitle}>Filter Jobs</h2>
-          <div className={styles.filterControls}>
-            <div className={styles.filterGroup}>
-              <label>Skills</label>
-              <div className={styles.skillsInputWrapper}>
-                {filters.skills.map((skill, index) => (
-                  <span key={index} className={styles.skillTag}>
-                    {skill}
-                    <button
-                      type="button"
-                      className={styles.removeSkill}
-                      onClick={() => removeFilterSkill(index)}
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-                <input
-                  type="text"
-                  value={filterInput}
-                  onChange={(e) => setFilterInput(e.target.value)}
-                  onKeyDown={handleFilterSkillKeyDown}
-                  placeholder="Type and press Enter to add"
-                  className={styles.skillInput}
-                />
-              </div>
-            </div>
-
-            <div className={styles.budgetFilter}>
-              <div className={styles.formGroup}>
-                <label htmlFor="minBudget">Min Budget ($)</label>
-                <input
-                  id="minBudget"
-                  name="minBudget"
-                  type="number"
-                  value={filters.minBudget}
-                  onChange={handleFilterChange}
-                  placeholder="Min"
-                  min={0}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label htmlFor="maxBudget">Max Budget ($)</label>
-                <input
-                  id="maxBudget"
-                  name="maxBudget"
-                  type="number"
-                  value={filters.maxBudget}
-                  onChange={handleFilterChange}
-                  placeholder="Max"
-                  min={0}
-                />
-              </div>
-            </div>
-
-            <button
-              type="button"
-              className={styles.clearFiltersButton}
-              onClick={clearFilters}
-            >
-              Clear Filters
-            </button>
-          </div>
-        </div>
-
-        <h2 className={styles.sectionTitle}>Posted Jobs</h2>
-        {filteredJobs.length === 0 ? (
-          <div className={styles.emptyState}>
-            <p>No jobs match your filters. Try adjusting your criteria.</p>
-          </div>
-        ) : (
-          <div className={styles.jobsGrid}>
-  {filteredJobs.map(job => (
-    <JobCard 
-      key={job._id} 
-      job={job} 
-      onBookmarkToggle={(jobId, isBookmarked) => {
-        // This will be called when a bookmark is toggled
-        console.log(`Job ${jobId} bookmark status changed to: ${isBookmarked}`);
-        // You can add additional logic here if needed
-      }}
-    />
-  ))}
-</div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-export default JobPostForm;
