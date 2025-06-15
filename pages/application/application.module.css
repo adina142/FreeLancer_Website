@@ -80,4 +80,53 @@
   opacity: 0;
   cursor: pointer;
 }
+.fileInputLabel {
+  flex: 1;
+  padding: 0.85rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px 0 0 8px;
+  background-color: #f8fafc;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #718096;
+}
+
+.fileInputButton {
+  padding: 0.85rem 1.5rem;
+  background-color: #edf2f7;
+  border: 1px solid #e2e8f0;
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+  font-weight: 600;
+  color: #4a5568;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.fileInputButton:hover {
+  background-color: #e2e8f0;
+}
+
+.submitBtn {
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  background-color: #4299e1;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.submitBtn:hover {
+  background-color: #3182ce;
+  transform: translateY(-1px);
+}
+
 
