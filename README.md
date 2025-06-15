@@ -58,3 +58,17 @@ POST /api/jobs/:id/apply — Apply to a job
 POST /api/bookmarks/:id — Bookmark/unbookmark a job
 
 GET /api/bookmarks — Get all bookmarked jobs
+
+![image](https://github.com/user-attachments/assets/309384dd-9903-4926-9231-92482d06ef97)
+![image](https://github.com/user-attachments/assets/fc337450-7225-41d0-987f-4f52d5809382)
+![image](https://github.com/user-attachments/assets/8730fc5e-1b3c-41b2-833a-1c68bb6b9d4d)
+
+**MAINPAGE**
+![image](https://github.com/user-attachments/assets/ed757277-ab27-4142-b102-0e4746eedf4b)
+
+![image](https://github.com/user-attachments/assets/dc425ffe-f82e-42db-abea-97425f2849d2)
+
+
+
+
+
