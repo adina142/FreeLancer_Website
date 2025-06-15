@@ -120,5 +120,27 @@ const Application = () => {
           </div>
         </div>
 
+        <button 
+          type="submit" 
+          className={styles.submitBtn}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <span className={styles.spinner}></span>
+          ) : (
+            'Submit Application'
+          )}
+        </button>
 
+        {message.text && (
+          <div className={${styles.message} ${styles[message.type]}}>
+            {message.text}
+          </div>
+        )}
+      </form>
+    </div>
+  );
+};
+
+export default Application;
 
