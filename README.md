@@ -41,21 +41,20 @@ A full-stack freelance job marketplace where clients can post jobs and freelance
    ```bash
    git clone https://github.com/adina142/freelancer-website.git
    cd freelancer-website
-freelancer-website/
-│
-├── backend/
-│   ├── controllers/
-│   ├── models/
-│   ├── routes/
-│   ├── middleware/
-│   └── server.js
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── context/
-│   │   └── App.js
-│   └── public/
-│
-└── README.md
+
+📮 API Endpoints (Sample)
+🔑 Auth
+POST /api/auth/register — Register new user
+
+POST /api/auth/login — Login and receive token
+
+💼 Jobs
+POST /api/jobs — Post new job (requires token)
+
+GET /api/jobs — Get all jobs
+
+POST /api/jobs/:id/apply — Apply to a job
+
+POST /api/bookmarks/:id — Bookmark/unbookmark a job
+
+GET /api/bookmarks — Get all bookmarked jobs
