@@ -162,3 +162,95 @@
   font-size: 1.2rem;
   opacity: 0.9;
 }
+
+
+/* Team Section */
+.teamGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  margin-top: 50px;
+}
+
+/* CTA Section */
+.ctaSection {
+  text-align: center;
+  background-color: #f5f5f5;
+}
+
+.ctaTitle {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: #1976d2;
+}
+
+.ctaText {
+  font-size: 1.2rem;
+  max-width: 700px;
+  margin: 0 auto 40px;
+  color: #666;
+}
+
+.ctaButtons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.primaryButton, .secondaryButton {
+  padding: 15px 30px;
+  font-size: 1.1rem;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.primaryButton {
+  background-color: #1976d2;
+  color: white;
+  border: none;
+}
+
+.primaryButton:hover {
+  background-color: #1565c0;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(25, 118, 210, 0.3);
+}
+
+.secondaryButton {
+  background-color: transparent;
+  color: #1976d2;
+  border: 2px solid #1976d2;
+}
+
+.secondaryButton:hover {
+  background-color: rgba(25, 118, 210, 0.1);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(25, 118, 210, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .missionGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .heroTitle {
+    font-size: 2.5rem;
+  }
+  
+  .heroSubtitle {
+    font-size: 1.2rem;
+  }
+  
+  .ctaButtons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .primaryButton, .secondaryButton {
+    width: 100%;
+    max-width: 300px;
+  }
+}
