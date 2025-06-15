@@ -576,3 +576,23 @@
   cursor: not-allowed;
 }
 
+.commentToggle {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.9em;
+}
+
+.commentToggle:hover {
+  color: #333;
+}
+
+
+.secondaryActions {
+  display: flex;
+  gap: 10px;
+}
