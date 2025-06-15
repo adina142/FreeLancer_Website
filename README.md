@@ -70,6 +70,18 @@ GET /api/bookmarks — Get all bookmarked jobs
 
 ![image](https://github.com/user-attachments/assets/d9a7ebba-07d2-4212-b812-e513a70730b4)
 
+![image](https://github.com/user-attachments/assets/2b667190-b569-45fa-ab32-0af5ca930003)
+
+![image](https://github.com/user-attachments/assets/51b34564-afb9-4189-8877-2e2ffca5ec9b)
+
+![image](https://github.com/user-attachments/assets/4047f015-42e5-4f7a-8339-582020fde165)
+
+![image](https://github.com/user-attachments/assets/2a89949d-e364-4b38-9059-494b3cf864e7)
+
+
+
+
+
 
 
 
