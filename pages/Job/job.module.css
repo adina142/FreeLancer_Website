@@ -520,3 +520,21 @@
   border-radius: 5px;
 }
 
+.commentHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  font-size: 0.9em;
+}
+
+.commentDate {
+  color: #666;
+  font-size: 0.8em;
+}
+
+.commentText {
+  margin: 0;
+  font-size: 0.95em;
+}
+
+
