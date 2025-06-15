@@ -544,5 +544,33 @@ const JobPostForm = () => {
           )}
         </form>
       </div>
+      {/* JOB LISTING */}
+      <div className={styles.jobsSection}>
+        <h2>Posted Jobs</h2>
+        {filteredJobs.length === 0 ? (
+          <p>No jobs match your filters.</p>
+        ) : (
+          <div className={styles.jobsGrid}>
+            {filteredJobs.map(job => (
+              <JobCard
+                key={job._id}
+                job={job}
+                showComments={activeCommentsJobId === job._id}
+                onToggleComments={toggleComments}
+                comments={comments[job._id] || []}
+                onCommentSubmit={() => handleCommentSubmit(job._id)}
+                commentText={commentInputs[job._id] || ''}
+                onCommentInputChange={(text) =>
+                  setCommentInputs(prev => ({ ...prev, [job._id]: text }))
+                }
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
+export default JobPostForm;
 
