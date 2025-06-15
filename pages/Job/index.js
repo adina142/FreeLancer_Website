@@ -444,4 +444,105 @@ const JobPostForm = () => {
       console.error('Error posting comment:', err);
     }
   };
+  const filteredJobs = filterJobs(jobs);
+
+  return (
+    <div className={styles.container}>
+      {/* FORM */}
+      <div className={styles.formSection}>
+        <form className={styles.jobForm} onSubmit={handleSubmit}>
+          <h2 className={styles.formTitle}>Post a Freelance Job</h2>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="title">Job Title</label>
+            <input
+              id="title"
+              name="title"
+              type="text"
+              value={formData.title}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="description">Description</label>
+            <div className={styles.descriptionWithEmoji}>
+              <textarea
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                required
+                rows={4}
+              />
+              <button
+                type="button"
+                onClick={() => setShowEmojiPicker(prev => !prev)}
+                className={styles.emojiButton}
+              >
+                <FaSmile />
+              </button>
+              {showEmojiPicker && (
+                <div className={styles.emojiPickerWrapper}>
+                  <EmojiPicker onEmojiClick={handleEmojiClick} />
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label>Budget ($)</label>
+              <input
+                name="budget"
+                type="number"
+                value={formData.budget}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label>Skills</label>
+              <div className={styles.skillsInputWrapper}>
+                {skills.map((skill, index) => (
+                  <span key={index} className={styles.skillTag}>
+                    {skill}
+                    <button type="button" onClick={() => removeSkill(index)}>×</button>
+                  </span>
+                ))}
+                <input
+                  type="text"
+                  value={skillInput}
+                  onChange={(e) => setSkillInput(e.target.value)}
+                  onKeyDown={handleSkillKeyDown}
+                  placeholder="Type and press Enter"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Deadline</label>
+            <input
+              name="deadline"
+              type="date"
+              value={formData.deadline}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <button type="submit" className={styles.submitButton} disabled={submitting}>
+            {submitting ? 'Posting...' : 'Post Job'}
+          </button>
+
+          {message.text && (
+            <p className={${styles.message} ${styles[message.type]}}>
+              {message.text}
+            </p>
+          )}
+        </form>
+      </div>
+
 
