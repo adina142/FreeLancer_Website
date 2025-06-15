@@ -41,3 +41,21 @@ A full-stack freelance job marketplace where clients can post jobs and freelance
    ```bash
    git clone https://github.com/adina142/freelancer-website.git
    cd freelancer-website
+freelancer-website/
+│
+├── backend/
+│   ├── controllers/
+│   ├── models/
+│   ├── routes/
+│   ├── middleware/
+│   └── server.js
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── context/
+│   │   └── App.js
+│   └── public/
+│
+└── README.md
