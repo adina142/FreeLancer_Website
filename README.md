@@ -87,3 +87,4 @@ GET /api/bookmarks — Get all bookmarked jobs
 
 
 
+// Added project description
